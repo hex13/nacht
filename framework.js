@@ -1,4 +1,4 @@
-const IS_STATE = Symbol('State');
+import { IS_STATE } from './state.js';
 
 // represents running instance of component in program 
 function View() {
@@ -151,25 +151,4 @@ export function emit(view, event) {
     })
 }
 
-export function State(value) {
-    let listeners = [];
-    return {
-        [IS_STATE]: true,
-        get: () => value,
-        trigger(action) {
-            listeners.forEach(listener => {
-                listener(action);
-            });
-        },
-        set(newValue) {
-            this.trigger({type: 'update', newValue, oldValue: value})
-            value = newValue;
-        },
-        subscribe(listener) {
-            listeners.push(listener);
-            return () => {
-                listeners = listeners.filter(x => x !== listener);
-            };
-        }
-    }
-}
+

@@ -1,4 +1,5 @@
-import { create, once, update, emit, remove, State } from './framework.js';
+import { create, once, update, emit, remove } from './framework.js';
+import { State } from './state.js';
 
 const TitleView = initialTitle => view => {
     let c = 0;
