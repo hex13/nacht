@@ -1,4 +1,4 @@
-import { IS_STATE } from './state.js';
+import { resolveObject } from './resolver.js';
 
 // represents running instance of component in program 
 function View() {
@@ -50,21 +50,6 @@ const domManipulator = {
 const manipulator = domManipulator;
 
 
-function resolveUpdates(updates) {
-    const newData = {};
-    const deps = {};
-    Object.entries(updates).forEach(([k, thing]) => {
-        if (thing && thing[IS_STATE]) {
-            deps[k] = thing;
-            newData[k] = thing.get();
-        } else {
-            newData[k] = thing;
-        }
-    });
-    return { newData, deps };
-}
-
-
 function rawUpdate(view, newData) {
     const { data, el } = view;
     manipulator.updateElement(el, newData, data);
@@ -97,7 +82,7 @@ export function create(desc, parent) {
 
 let id = 0;
 export function update(view, updates) {
-    const { newData, deps } = resolveUpdates(updates);
+    const { resolvedData, deps } = resolveObject(updates);
     Object.entries(deps).forEach(([k, thing]) => {
         const _id = id++;
         view.cleanups.push(thing.subscribe((action) => {
@@ -107,7 +92,7 @@ export function update(view, updates) {
         // console.log("SUBSKRYPCAJ!", item.cleanups.length, )
     });
     Object.assign(view.deps, deps);
-    rawUpdate(view, newData);
+    rawUpdate(view, resolvedData);
 }
 
 export function remove(view) {
