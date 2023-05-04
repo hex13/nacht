@@ -1,7 +1,8 @@
 import { resolveObject } from './resolver.js';
 import { domManipulator as manipulator } from './dom.js';
 import { View } from './view.js';
-import { Emitter } from './state.js';
+import { Emitter, on } from './events.js';
+
 
 function rawUpdate(view, newData) {
     const { data } = view;
@@ -55,37 +56,3 @@ export function remove(view) {
     cleanup(view);
     manipulator.removeElement(view.el);
 }
-
-
-export function once(target, eventType) {
-    return new Promise(resolve => {
-        const handlers = {};
-        const eventTypes = Array.isArray(eventType)? eventType : [eventType];
-        eventTypes.forEach(type => handlers[type] = resolve);
-        on(target, handlers, true);
-    });
-}
-
-function isEventTarget(target) {
-    return target && typeof target.addEventListener == 'function' && typeof target.removeEventListener == 'function';
-}
-function on(target, events, once = false) {
-    Object.entries(events).forEach(([type, listener]) => {
-        if (target.emitter) {
-            const dispose = target.emitter.on(type).subscribe(action => {
-                listener(action.newValue, target);
-                if (once) dispose();
-            });
-        } else if (isEventTarget(target)) {
-            const internalListener = (e) => {
-                listener(e, target);
-                if (once) {
-                    target.removeEventListener(type, internalListener);
-                }
-            };
-            target.addEventListener(type, internalListener);
-        } else throw new Error("wrong target for on(): " + String(target));
-    });
-}
-
-
