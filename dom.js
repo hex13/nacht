@@ -1,10 +1,14 @@
 export const domManipulator = {
+    document,
     createElement(type, parent) {
-        const el = document.createElement(type);
+        const el = this.document.createElement(type);
         if (parent) parent.appendChild(el);
         return el;
     },
-    updateElement(el, newData, oldData) {
+    updateElement({ el, parent }, newData, oldData) {
+        if (!el) {
+            el = this.createElement(newData.type, parent);
+        }
         Object.entries(newData).forEach(([k, v]) => {
             if (k === 'text' && v !== oldData.text) {
                 el.innerText = v;
@@ -21,6 +25,7 @@ export const domManipulator = {
                 el.className = v.join(' ');
             }
         });
+        return el;
     },
     isElement(x) {
         return x instanceof Node;

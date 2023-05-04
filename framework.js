@@ -2,9 +2,11 @@ import { resolveObject } from './resolver.js';
 import { domManipulator } from './dom.js';
 
 // represents running instance of component in program 
-function View() {
+function View(parent) {
     return {
+        parent,
         customListeners: {},
+        data: {},
         deps: {},
         cleanups: [],
         initializers: [],
@@ -21,8 +23,8 @@ const manipulator = domManipulator;
 
 
 function rawUpdate(view, newData) {
-    const { data, el } = view;
-    manipulator.updateElement(el, newData, data);
+    const { data } = view;
+    view.el = manipulator.updateElement(view, newData, data);
     Object.assign(data, newData);
 }
 
@@ -34,16 +36,14 @@ function cleanup(view) {
 }
 
 export function create(desc, parent) {
-    const view = new View();
+    const view = new View(parent);
     const [type, data, children = []] = typeof desc == 'function'? desc(view) : desc;
-    const el = manipulator.createElement(type, parent);
-    Object.assign(view, {
-        el, 
-        data: {},
-        children: children.map(child => create(child, el)),
-    });
+    data.type = type;
 
     update(view, data);
+
+    view.children = resolveObject({children}).resolvedData.children.map(child => create(child, view.el));
+
     if (data.events) on(view, data.events);
     if (data.onceEvents) on(view, data.onceEvents, true);
     view.initializers.forEach(initializer => initializer(view));
