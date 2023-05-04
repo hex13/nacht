@@ -27,6 +27,9 @@ export const domManipulator = {
         });
         return el;
     },
+    removeElement(el) {
+        el.remove();
+    },
     isElement(x) {
         return x instanceof Node;
     },

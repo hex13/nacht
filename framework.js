@@ -48,7 +48,7 @@ export function update(view, updates) {
 export function remove(view) {
     console.log("REMOVE, CLEANUPS", view.cleanups.slice())
     cleanup(view);
-    view.el.remove();
+    manipulator.removeElement(view.el);
 }
 
 
