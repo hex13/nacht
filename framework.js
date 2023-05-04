@@ -1,26 +1,6 @@
 import { resolveObject } from './resolver.js';
-import { domManipulator } from './dom.js';
-
-// represents running instance of component in program 
-function View(parent) {
-    return {
-        parent,
-        customListeners: {},
-        data: {},
-        deps: {},
-        cleanups: [],
-        initializers: [],
-        withCleanup(cleanup) {
-            this.cleanups.push(cleanup);
-        },
-        onCreate(initializer) {
-            this.initializers.push(initializer);
-        }
-    };
-}
-
-const manipulator = domManipulator;
-
+import { domManipulator as manipulator } from './dom.js';
+import { View } from './view.js';
 
 function rawUpdate(view, newData) {
     const { data } = view;
