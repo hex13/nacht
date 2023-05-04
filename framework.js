@@ -1,10 +1,15 @@
 import { resolveObject } from './resolver.js';
 import { domManipulator as manipulator } from './dom.js';
 import { View } from './view.js';
+import { Emitter } from './state.js';
 
 function rawUpdate(view, newData) {
     const { data } = view;
+    const prevEl = view.el;
     view.el = manipulator.updateElement(view, newData, data);
+    if (view.el !== prevEl) {
+        view.emitter = new Emitter(view.el);
+    }
     Object.assign(data, newData);
 }
 

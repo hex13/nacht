@@ -8,11 +8,13 @@ export function View(parent) {
         deps: {},
         cleanups: [],
         initializers: [],
+        el: null,
+        emitter: null,
         withCleanup(cleanup) {
             this.cleanups.push(cleanup);
         },
         onCreate(initializer) {
             this.initializers.push(initializer);
-        }
+        },
     };
 }
