@@ -66,24 +66,25 @@ export function once(target, eventType) {
     });
 }
 
+function isEventTarget(target) {
+    return target && typeof target.addEventListener == 'function' && typeof target.removeEventListener == 'function';
+}
 function on(target, events, once = false) {
-    if (manipulator.isElement(target)) {
-        return on({el: target}, events, once);
-    } else Object.entries(events).forEach(([type, listener]) => {
+    Object.entries(events).forEach(([type, listener]) => {
         if (target.emitter) {
             const dispose = target.emitter.on(type).subscribe(action => {
                 listener(action.newValue, target);
                 if (once) dispose();
             });
-        } else {
+        } else if (isEventTarget(target)) {
             const internalListener = (e) => {
                 listener(e, target);
                 if (once) {
-                    manipulator.removeEventListener(target.el, type, internalListener);
+                    target.removeEventListener(type, internalListener);
                 }
             };
-            manipulator.addEventListener(target.el, type, internalListener);
-        }
+            target.addEventListener(type, internalListener);
+        } else throw new Error("wrong target for on(): " + String(target));
     });
 }
 
