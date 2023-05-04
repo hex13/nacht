@@ -39,15 +39,35 @@ function rawUpdate(view, newData) {
     merge(data, newData);
 }
 
+function set(o, path, v) {
+    const [k, ...rest] = path;
+    if (path.length == 1) {
+        o[k] = v;
+    } else {
+        if (o[k] == undefined) {
+            o[k] = {};
+        }
+        set(o[k], rest, v);
+    }
+}
+
 export function update(view, updates) {
     const { resolvedData, deps } = resolveObject(updates, true);
-    // TODO make reactivity recursive
-    Object.entries(deps).forEach(([k, thing]) => {
-        if (thing.subscribe) view.cleanups.push(thing.subscribe((action) => {
-            rawUpdate(view, {[k]: action.newValue});
-        }));
-    });
-    Object.assign(view.deps, deps);
+    const visit = (node, path) => {
+        Object.entries(node).forEach(([k, thing]) => {
+            if (thing.subscribe) {
+                view.cleanups.push(thing.subscribe((action) => {
+                    const updates = {};
+                    set(updates, path.concat(k), action.newValue);
+                    rawUpdate(view, updates);
+                }));
+            } else if (thing && typeof thing == 'object') {
+                visit(thing, path.concat(k));
+            }
+        });
+    };
+    visit(deps, []);
+    merge(view.deps, deps);
     rawUpdate(view, resolvedData);
 }
 

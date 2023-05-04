@@ -109,7 +109,7 @@ const tree = create([
         ['button', {text: 'pierwszy button', events: {...dragEvents, $drag() { console.log("DRAG!") } }}],
         [
             'button', {
-                text: 'kokoko',
+                text: randomColor,
                 style: {background: 'yellow', color: randomColor},
                 events: {
                     ...dragEvents, 
