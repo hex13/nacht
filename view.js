@@ -3,7 +3,6 @@
 export function View(parent) {
     return {
         parent,
-        customListeners: {},
         data: {},
         deps: {},
         cleanups: [],

@@ -1,4 +1,4 @@
-import { create, once, update, emit, remove } from './framework.js';
+import { create, once, update, remove } from './framework.js';
 import { State } from './state.js';
 
 const TitleView = initialTitle => view => {
@@ -39,8 +39,8 @@ const dragEvents = {
     mousedown() {
         down = true;
     },
-    mousemove(e, item) {
-        if (down) emit(item, {type: '$drag'});
+    mousemove(e, view) {
+        if (down) view.emitter.emit('$drag', {type: '$drag'});
     },
     mouseup() {
         down = false;

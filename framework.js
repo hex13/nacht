@@ -70,8 +70,11 @@ function on(target, events, once = false) {
     if (manipulator.isElement(target)) {
         return on({el: target}, events, once);
     } else Object.entries(events).forEach(([type, listener]) => {
-        if (type.indexOf('$') == 0) {
-            (target.customListeners[type] || (target.customListeners[type] = [])).push(listener);
+        if (target.emitter) {
+            const dispose = target.emitter.on(type).subscribe(action => {
+                listener(action.newValue, target);
+                if (once) dispose();
+            });
         } else {
             const internalListener = (e) => {
                 listener(e, target);
@@ -82,13 +85,6 @@ function on(target, events, once = false) {
             manipulator.addEventListener(target.el, type, internalListener);
         }
     });
-}
-
-export function emit(view, event) {
-    const listeners = view.customListeners[event.type] || [];
-    listeners.forEach(listener => {
-        listener(event, view);
-    })
 }
 
 

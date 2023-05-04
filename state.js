@@ -28,12 +28,17 @@ export function Emitter(eventTarget) {
             let subject = observables[type];
             if (!subject) {
                 subject = State();
-                eventTarget && eventTarget.addEventListener(type, (e) => {
-                    subject.set(e);
-                });
+                if (eventTarget && type.indexOf('$') != 0) {
+                    eventTarget.addEventListener(type, (e) => {
+                        subject.set(e);
+                    });
+                }
             }
             observables[type] = subject;
             return subject;
+        },
+        emit(type, event) {
+            this.on(type).set(event);
         }
     }
 }
