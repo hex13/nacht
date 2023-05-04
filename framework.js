@@ -2,6 +2,7 @@ import { resolveObject } from './resolver.js';
 import { domManipulator as manipulator } from './dom.js';
 import { View } from './view.js';
 import { Emitter, on } from './events.js';
+import { merge, set } from './objects.js';
 
 export function create(desc, parent) {
     const view = new View(parent);
@@ -18,17 +19,6 @@ export function create(desc, parent) {
     return view;
 }
 
-function merge(dest, src) {
-    for (const k in src) {
-        if (src[k] && typeof src[k] == 'object') {
-            if (!dest[k]) dest[k] = {};
-            merge(dest[k], src[k])
-        } else {
-            dest[k] = src[k];
-        }
-    }
-}
-
 function rawUpdate(view, newData) {
     const { data } = view;
     const prevEl = view.el;
@@ -39,17 +29,6 @@ function rawUpdate(view, newData) {
     merge(data, newData);
 }
 
-function set(o, path, v) {
-    const [k, ...rest] = path;
-    if (path.length == 1) {
-        o[k] = v;
-    } else {
-        if (o[k] == undefined) {
-            o[k] = {};
-        }
-        set(o[k], rest, v);
-    }
-}
 
 export function update(view, updates) {
     const { resolvedData, deps } = resolveObject(updates, true);
