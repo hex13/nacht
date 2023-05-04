@@ -40,9 +40,10 @@ function rawUpdate(view, newData) {
 }
 
 export function update(view, updates) {
-    const { resolvedData, deps } = resolveObject(updates);
+    const { resolvedData, deps } = resolveObject(updates, true);
+    // TODO make reactivity recursive
     Object.entries(deps).forEach(([k, thing]) => {
-        view.cleanups.push(thing.subscribe((action) => {
+        if (thing.subscribe) view.cleanups.push(thing.subscribe((action) => {
             rawUpdate(view, {[k]: action.newValue});
         }));
     });

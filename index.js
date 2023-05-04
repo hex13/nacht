@@ -76,6 +76,16 @@ const todos = [
     'obejrzeć serial',
 ];
 
+const randomColor = State();
+
+setInterval(() => {
+    const colors = ['red', 'orange', 'blue', 'green', 'purple'];
+    randomColor.set(colors[~~(Math.random() * colors.length)]);
+}, 1000);
+
+randomColor.subscribe(({newValue}) => {
+    console.log("nowy kolor", newValue);
+})
 const tree = create([
     'div', {}, [
         TitleView('koteczek'),
@@ -99,11 +109,14 @@ const tree = create([
         ['button', {text: 'pierwszy button', events: {...dragEvents, $drag() { console.log("DRAG!") } }}],
         [
             'button', {
-                text: 'drugi button', 
+                text: 'kokoko',
+                style: {background: 'yellow', color: randomColor},
                 events: {
                     ...dragEvents, 
                     $drag(e, item) {
-                        update(item, {text: Math.random()});
+                        const k = 'a' + Math.random();
+                        console.log("ITEMO:", item.data.style)
+                        update(item, {text: Math.random(), style: {[k]: 1, }});
                     },
                 }
             },
