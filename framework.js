@@ -18,6 +18,17 @@ export function create(desc, parent) {
     return view;
 }
 
+function merge(dest, src) {
+    for (const k in src) {
+        if (src[k] && typeof src[k] == 'object') {
+            if (!dest[k]) dest[k] = {};
+            merge(dest[k], src[k])
+        } else {
+            dest[k] = src[k];
+        }
+    }
+}
+
 function rawUpdate(view, newData) {
     const { data } = view;
     const prevEl = view.el;
@@ -25,7 +36,7 @@ function rawUpdate(view, newData) {
     if (view.el !== prevEl) {
         view.emitter = new Emitter(view.el);
     }
-    Object.assign(data, newData);
+    merge(data, newData);
 }
 
 export function update(view, updates) {
