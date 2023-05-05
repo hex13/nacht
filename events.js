@@ -53,20 +53,3 @@ export function on(target, events, once = false) {
         } else throw new Error("wrong target for on(): " + String(target));
     });
 }
-
-// testing
-const em = new Emitter();
-const click = em.on('click');
-click.subscribe(e => {
-    console.log("emitter, value", e);
-})
-const click1 = em.on('click');
-click.set(120);
-click1.set(460);
-
-
-const doc = new Emitter(document);
-
-doc.on('click').subscribe(e => {
-    console.log("document clicked:", e);
-})
