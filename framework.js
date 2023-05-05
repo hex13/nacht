@@ -1,8 +1,11 @@
 import { resolveObject } from './resolver.js';
-import { domManipulator as manipulator } from './dom.js';
+import { createDomManipulator } from './dom.js';
 import { View } from './view.js';
 import { Emitter, on } from './events.js';
 import { merge, set } from './objects.js';
+
+
+const manipulator = createDomManipulator(document);
 
 export function create(desc, parent) {
     const view = new View(parent);

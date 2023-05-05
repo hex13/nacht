@@ -1,4 +1,4 @@
-export const domManipulator = {
+export const createDomManipulator = (document) => ({
     document,
     createElement(type, parent) {
         const el = this.document.createElement(type);
@@ -35,4 +35,4 @@ export const domManipulator = {
     },
     addEventListener: (el, ...args) => el.addEventListener(...args),
     removeEventListener: (el, ...args) => el.removeEventListener(...args),
-};
+});
