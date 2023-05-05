@@ -1,5 +1,6 @@
 {
   "name": "nacht",
+  "type": "module",
   "version": "0.0.2",
   "description": "reactive GUI framework",
   "main": "index.js",
