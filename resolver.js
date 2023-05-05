@@ -12,7 +12,7 @@ should return:
     {a: {foo: state1}, b: state2}
 */
 
-export function resolveObject(object, recursive = false) {
+export function resolveObject(object) {
     const resolvedTree = {};
     const depTree = {};
     const visit = (node, resolvedObject, deps) => {
@@ -20,7 +20,7 @@ export function resolveObject(object, recursive = false) {
             if (thing && thing[IS_STATE]) {
                 deps[k] = thing;
                 resolvedObject[k] = thing.get();
-            } else if (recursive && thing && typeof thing == 'object' && !Array.isArray(thing)) {
+            } else if (thing && typeof thing == 'object' && !Array.isArray(thing)) {
                 resolvedObject[k] = {};
                 deps[k] = {};
                 visit(thing, resolvedObject[k], deps[k]);
@@ -31,24 +31,4 @@ export function resolveObject(object, recursive = false) {
     }
     visit(object, resolvedTree, depTree);
     return { resolvedData: resolvedTree, deps: depTree };
-}
-
-function testResolve(object) {
-    console.log("resolve object", object);
-    console.log("result", resolveObject(object, true).resolvedData)
-    console.log('---');
-}
-
-
-    testResolve({
-        a: State(123),
-    });
-
-{
-    const state1 = State(123);
-    const state2 = State(456);
-    // testResolve({a: {foo: state1, }, b: state2, c: 1});
-    // testResolve({a: {foo: state1, bar: {baz: state1}}, b: state2, c: 1});
-    testResolve({f: () => {}, a: {someFunc: () => {}}});
-    // throw new Error
 }
