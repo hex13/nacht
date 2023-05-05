@@ -1,8 +1,9 @@
-import { create, update, remove } from './framework.js';
+import { Engine } from './framework.js';
 import { State } from './state.js';
 import { once } from './events.js';
+import { createDomManipulator } from './dom.js';
 
-
+const { create, update, remove } = new Engine(createDomManipulator(document));
 const TitleView = initialTitle => view => {
     let c = 0;
     const title = State(initialTitle);
