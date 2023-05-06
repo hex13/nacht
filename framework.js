@@ -12,7 +12,7 @@ export function Engine(manipulator) {
 
         update(view, data);
 
-        view.children = resolveObject({children}).resolvedData.children.map(child => create(child, view.el));
+        view.children = resolveObject({children}).resolvedData.children.map(child => create(child, view));
 
         if (data.events) on(view, data.events);
         if (data.onceEvents) on(view, data.onceEvents, true);
@@ -23,7 +23,7 @@ export function Engine(manipulator) {
     function rawUpdate(view, newData) {
         const { data } = view;
         const prevEl = view.el;
-        view.el = manipulator.updateElement(view, newData, data);
+        view.el = manipulator.updateElement(view.el, view.parent?.el, newData, data);
         if (view.el !== prevEl) {
             view.emitter = new Emitter(view.el);
         }

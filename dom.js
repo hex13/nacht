@@ -1,13 +1,13 @@
 export const createDomManipulator = (document) => ({
     document,
-    createElement(type, parent) {
+    createElement(type, parentEl) {
         const el = this.document.createElement(type);
-        if (parent) parent.appendChild(el);
+        if (parentEl) parentEl.appendChild(el);
         return el;
     },
-    updateElement({ el, parent }, newData, oldData) {
+    updateElement(el, parentEl, newData, oldData) {
         if (!el) {
-            el = this.createElement(newData.type, parent);
+            el = this.createElement(newData.type, parentEl);
         }
         Object.entries(newData).forEach(([k, v]) => {
             if (k === 'text' && v !== oldData.text) {
