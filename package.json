@@ -5,7 +5,8 @@
   "description": "reactive GUI framework",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "start": "esbuild examples/counter.jsx --jsx-factory=h --outfile=examples/counter.js --watch"
   },
   "author": "Łukasz Lityński",
   "license": "MIT",
