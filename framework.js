@@ -2,6 +2,7 @@ import { resolveObject } from './resolver.js';
 import { View } from './view.js';
 import { Emitter, on } from './events.js';
 import { merge, set } from './objects.js';
+import { IS_STATE } from './state.js';
 
 
 export function Engine(manipulator) {
@@ -62,5 +63,16 @@ export function Engine(manipulator) {
         manipulator.removeElement(view.el);
     }
 
-    return { create, update, remove };
+    return { create, update, remove, h };
 }
+
+export function h(type, props, ...children) {
+    return [
+        type,
+        props || {},
+        children.map(x => {
+            if (typeof x == 'string' || (x && x[IS_STATE])) return ['span', {text: x}];
+            return x;
+        })
+    ];
+};

@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
-import { Engine } from '../framework.js';
+import { Engine, h } from '../framework.js';
 import { isView } from '../view.js';
 import { State } from '../state.js';
 import { merge } from '../objects.js';
@@ -166,4 +166,35 @@ describe('Engine', () => {
         }, 0);
     });
 
+});
+
+describe('h()', () => {
+    it('single element without props', () => {
+        assert.deepStrictEqual(h('foo'), ['foo', {}, []]);
+    });
+    it('single element with props', () => {
+        assert.deepStrictEqual(h('foo', {a: 1, foo: {bar: 2}}), ['foo', {a: 1, foo: {bar: 2}}, []]);
+    });
+    it('element with children', () => {
+        const tree = h(
+            'foo', {a: 1},
+            h('child1'),
+            h('child2', {}, h('grandchild')),
+        );
+        assert.deepStrictEqual(tree, [
+            'foo', {a: 1}, [
+                ['child1', {}, []],
+                ['child2', {}, [['grandchild', {}, []]]],
+            ]
+        ]);
+    });
+    it('string as child', () => {
+        assert.deepStrictEqual(h('foo', {baz: 3}, "kotek"), ['foo', {baz: 3}, [['span', {text: 'kotek'}]]]);
+    });
+    it('State as child', () => {
+        const state = State(10);
+        const tree = h('foo', {baz: 3}, state);
+        assert.deepStrictEqual(tree, ['foo', {baz: 3}, [['span', {text: state}]]]);
+        assert.strictEqual(tree[2][0][1].text, state);
+    });
 });
