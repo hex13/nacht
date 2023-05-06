@@ -1,7 +1,8 @@
-
+const IS_VIEW = Symbol('IS_VIEW');
 // represents running instance of component in program
 export function View(parent) {
     return {
+        [IS_VIEW]: true,
         parent,
         data: {},
         deps: {},
@@ -17,3 +18,5 @@ export function View(parent) {
         },
     };
 }
+
+export const isView = (thing) => thing[IS_VIEW];

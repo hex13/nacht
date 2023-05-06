@@ -7,7 +7,8 @@ import { merge, set } from './objects.js';
 export function Engine(manipulator) {
     function create(desc, parent) {
         const view = new View(parent);
-        const [type, data, children = []] = typeof desc == 'function'? desc(view) : desc;
+        const [type, descData, children = []] = typeof desc == 'function'? desc(view) : desc;
+        const data = {...descData};
         data.type = type;
 
         update(view, data);
