@@ -3,23 +3,31 @@ import { resolveObject } from '../resolver.js';
 import { Engine } from '../framework.js';
 import { isView } from '../view.js';
 import { State } from '../state.js';
+import { merge } from '../objects.js';
 
 
 describe('Engine', () => {
-    it('create() should create View', () => {
-        const adapter = {
-            updateElement(view) {
-                console.log("VVV", view);
+    let adapter;
+    let engine;
+    beforeEach(() => {
+        adapter = {
+            updateElement(el, parentEl, newData, oldData) {
+                if (!el) {
+                    el = {isTestElement: true, type: newData.type, props: {}};
+                }
+                merge(el.props, structuredClone(newData));
+                return el;
             },
             removeElement() {
 
             }
-        }
-        const engine = new Engine(adapter);
-
+        };
+        engine = new Engine(adapter);
+    });
+    it('create() should create single view', () => {
         const someState = State(91);
         const createTestProps = () => ({
-            foo: "wchodzi kotek",
+            foo: 'wchodzi kotek',
             abc: {
                 def: someState,
             }
@@ -29,13 +37,133 @@ describe('Engine', () => {
         assert.ok(isView(root));
         assert.deepStrictEqual(root.data, {
             type: 'div',
-            foo: "wchodzi kotek",
+            foo: 'wchodzi kotek',
             abc: {
                 def: 91,
+            }
+        });
+        assert.deepStrictEqual(root.el, {
+            isTestElement: true,
+            type: 'div',
+            props: {
+                type: 'div',
+                foo: 'wchodzi kotek',
+                abc: {
+                    def: 91,
+                }
             }
         });
         assert.notStrictEqual(root.data, props);
         assert.notStrictEqual(root.data.abc, props.abc);
         assert.deepStrictEqual(props, createTestProps());
     });
+    it('create() should create children views', () => {
+        const root = engine.create([
+            'main', {someProp: {abc: 1}}, [
+                ['foo', {yo: 'hey'}],
+                ['bar', {hey: 'yo'}],
+            ]
+        ]);
+        assert.strictEqual(root.children.length, 2);
+        assert.deepStrictEqual(root.data, {
+            type: 'main',
+            someProp: {abc: 1},
+        });
+        assert.deepStrictEqual(root.el, {
+            isTestElement: true,
+            type: 'main',
+            props: {type: 'main', someProp: {abc: 1}},
+        });
+
+        assert.deepStrictEqual(root.children[0].data, {
+            type: 'foo',
+            yo: 'hey',
+        });
+        assert.deepStrictEqual(root.children[0].el, {
+            isTestElement: true,
+            type: 'foo',
+            props: {type: 'foo', yo: 'hey'},
+        });
+
+        assert.deepStrictEqual(root.children[1].data, {
+            type: 'bar',
+            hey: 'yo',
+        });
+        assert.deepStrictEqual(root.children[1].el, {
+            isTestElement: true,
+            type: 'bar',
+            props: {type: 'bar', hey: 'yo'},
+        });
+    });
+    it('update() should update view', () => {
+        const root = engine.create([
+            'app', {
+                foo: 'whoa',
+                counter: 10,
+                some: {
+                    deep: 101,
+                    tief: 100,
+                },
+                reactive: State('red'),
+            },
+        ]);
+        engine.update(root, {
+            bar: 'baz',
+            counter: 11,
+            some: {
+                tief: 102,
+            }
+        });
+        const expected = {
+            type: 'app',
+            foo: 'whoa',
+            counter: 11,
+            bar: 'baz',
+            reactive: 'red',
+            some: {
+                deep: 101,
+                tief: 102,
+            }
+        };
+        assert.deepStrictEqual(root.data, expected);
+        assert.deepStrictEqual(root.el, {
+            isTestElement: true,
+            type: 'app',
+            props: expected,
+        });
+    });
+
+    it('should be reactive and automatically update view when State value changes', (done) => {
+        const color = State('red');
+        const element = State('fire');
+        const root = engine.create([
+            'app', {
+                foo: 'whoa',
+                color,
+                nested: {
+                    element,
+                }
+            },
+        ]);
+        color.set('blue');
+        element.set('water');
+        setTimeout(() => {
+            const expected = {
+                type: 'app',
+                foo: 'whoa',
+                color: 'blue',
+                nested: {
+                    element: 'water',
+                },
+            };
+            assert.deepStrictEqual(root.data, expected);
+            assert.deepStrictEqual(root.el, {
+                isTestElement: true,
+                type: 'app',
+                props: expected,
+            });
+            done();
+        }, 0);
+    });
+
 });
