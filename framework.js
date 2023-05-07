@@ -18,7 +18,7 @@ export function Engine(manipulator) {
 
         update(view, data);
 
-        view.children = resolveObject({children}).resolvedData.children.map(child => create(child, view));
+        replaceChildren(view, children);
 
         if (data.events) on(view, data.events);
         if (data.onceEvents) on(view, data.onceEvents, true);
@@ -59,6 +59,10 @@ export function Engine(manipulator) {
         visit(deps, []);
         merge(view.deps, deps);
         rawUpdate(view, resolvedData);
+    }
+
+    function replaceChildren(view, newChildren) {
+        view.children = newChildren.map(child => create(child, view))
     }
 
     function cleanup(view) {
