@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
-import { Engine, h } from '../framework.js';
+import { Engine, h, TYPE } from '../framework.js';
 import { isView } from '../view.js';
 import { State } from '../state.js';
 import { merge } from '../objects.js';
@@ -57,6 +57,48 @@ describe('Engine', () => {
         assert.notStrictEqual(root.data.abc, props.abc);
         assert.deepStrictEqual(props, createTestProps());
     });
+    it('create() should accept function as a type and handle it as component', () => {
+        const events = [];
+        const Foo = (props) => {
+            events.push(['Foo', props]);
+            return [
+                'app',
+                {abc: 'xyz'},
+                [
+                    ['child1', {foo: 'hello'}],
+                    ['child2', {foo: 'hello2'}],
+                ],
+            ]
+        };
+        const root = engine.create([
+            'main', {}, [
+                [Foo, {year: 2023}]
+            ]
+        ]);
+        assert.ok(isView(root));
+        assert.deepStrictEqual(events, [
+            ['Foo', {year: 2023}],
+        ]);
+
+        assert.strictEqual(root.children.length, 1);
+        const componentRoot = root.children[0];
+        assert.strictEqual(componentRoot.parent, root);
+
+        assert.deepStrictEqual(componentRoot.data, {
+            [TYPE]: 'app',
+            abc: 'xyz',
+        });
+        assert.deepStrictEqual(componentRoot.el, {
+            isTestElement: true,
+            [TYPE]: 'app',
+            props: {type: 'app', abc: 'xyz'},
+        });
+
+        assert.strictEqual(componentRoot.children.length, 2);
+        assert.deepStrictEqual(componentRoot.children[0].data, {[TYPE]: 'child1', foo: 'hello'});
+        assert.deepStrictEqual(componentRoot.children[1].data, {[TYPE]: 'child2', foo: 'hello2'});
+    });
+
     it('create() should create children views', () => {
         const root = engine.create([
             'main', {someProp: {abc: 1}}, [

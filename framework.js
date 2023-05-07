@@ -8,8 +8,12 @@ import { IS_STATE } from './state.js';
 export function Engine(manipulator) {
     function create(desc, parent) {
         const view = new View(parent);
-        const [type, descData, children = []] = typeof desc == 'function'? desc(view) : desc;
+        const [type, descData, children = []] = desc;
+
         const data = {...descData};
+        if (typeof type == 'function') {
+            return create(type(descData), parent);
+        }
         data.type = type;
 
         update(view, data);
@@ -76,3 +80,5 @@ export function h(type, props, ...children) {
         })
     ];
 };
+
+export const TYPE = 'type';
