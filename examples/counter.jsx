@@ -3,22 +3,26 @@ import { State } from '../state.js';
 import { createDomManipulator } from '../dom.js';
 const { create } = new Engine(createDomManipulator(document));
 
-// State represents reactive value
-// similar to observables, atoms, signals etc.
-// we can embed such State into JSX tree
-// and it will be automatically updated after given State object changes
-const count = State(0);
+function Counter({ initial }) {
+    // State represents reactive value
+    // similar to observables, atoms, signals etc.
+    // we can embed such State into JSX tree
+    // and it will be automatically updated after given State object changes
+    const count = State(initial);
 
-// just a helper function
-const handleInc = (amount) => () => {
-    count.set(count.get() + amount);
-};
+    // just a helper function
+    const handleInc = (amount) => () => {
+        count.set(count.get() + amount);
+    };
 
-const root = create(<div style={{padding: '100px'}}>
-    <div><span>Count: {count}</span></div>
-    <button events={{click: handleInc(-1)}}> - </button>
-    <button events={{click: handleInc(1)}}> + </button>
-</div>);
+    return <div style={{padding: '100px'}}>
+        <div><span>Count: {count}</span></div>
+        <button events={{click: handleInc(-1)}}> - </button>
+        <button events={{click: handleInc(1)}}> + </button>
+    </div>
+}
+
+const root = create(<Counter initial={100} />);
 
 // `root` variable now contains a View object which is used for representing one element and its data
 // every View object has `el` property which contains its dom element
