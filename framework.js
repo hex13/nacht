@@ -75,7 +75,7 @@ export function Engine(manipulator) {
         manipulator.removeElement(view.el);
     }
 
-    return { create, update, remove, h };
+    return { create, update, remove, };
 }
 
 export function h(type, props, ...children) {
