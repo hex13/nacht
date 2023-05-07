@@ -29,7 +29,11 @@ export function Engine(manipulator) {
     function rawUpdate(view, newData) {
         const { data } = view;
         const prevEl = view.el;
-        view.el = manipulator.updateElement(view.el, view.parent?.el, newData, data);
+        if (newData[TYPE] == FRAGMENT_TYPE) {
+            view.el = view.parent.el;
+        } else {
+            view.el = manipulator.updateElement(view.el, view.parent?.el, newData, data);
+        }
         if (view.el !== prevEl) {
             view.emitter = new Emitter(view.el);
         }
@@ -82,3 +86,4 @@ export function h(type, props, ...children) {
 };
 
 export const TYPE = 'type';
+export const FRAGMENT_TYPE = '$fragment';

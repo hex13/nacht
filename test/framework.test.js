@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
-import { Engine, h, TYPE } from '../framework.js';
+import { Engine, h, TYPE, FRAGMENT_TYPE } from '../framework.js';
 import { isView } from '../view.js';
 import { State } from '../state.js';
 import { merge } from '../objects.js';
@@ -13,7 +13,11 @@ describe('Engine', () => {
         adapter = {
             updateElement(el, parentEl, newData, oldData) {
                 if (!el) {
-                    el = {isTestElement: true, type: newData.type, props: {}};
+                    el = {
+                        isTestElement: true, type: newData.type, props: {},
+                        // TODO
+                        // children: []
+                    };
                 }
                 merge(el.props, structuredClone(newData));
                 return el;
@@ -136,6 +140,20 @@ describe('Engine', () => {
             type: 'bar',
             props: {type: 'bar', hey: 'yo'},
         });
+    });
+    it('create() should create fragment', () => {
+        const root = engine.create([
+            'main', {}, [
+                ['foo1', {}],
+                [FRAGMENT_TYPE, {}, [
+                    ['foo2', {}],
+                    ['foo3', {}],
+                ]],
+            ]
+        ]);
+        const fragment = root.children[1];
+        assert.deepStrictEqual(fragment.data[TYPE], FRAGMENT_TYPE);
+        assert.strictEqual(fragment.el, root.el);
     });
     it('update() should update view', () => {
         const root = engine.create([

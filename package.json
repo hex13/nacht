@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "esbuild examples/counter.jsx --jsx-factory=h --outfile=examples/counter.js --watch"
+    "start": "esbuild examples/counter.jsx --jsx-factory=h --jsx-fragment=\"'\\$fragment'\" --outfile=examples/counter.js --watch"
   },
   "author": "Łukasz Lityński",
   "license": "MIT",
