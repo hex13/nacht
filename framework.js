@@ -9,15 +9,12 @@ export function Engine(manipulator) {
     function create(desc, parent) {
         const view = new View(parent);
         const [type, descData, children = []] = desc;
-
         const data = {...descData};
         if (typeof type == 'function') {
             return create(type(descData), parent);
         }
         data.type = type;
-
         update(view, data);
-
         replaceChildren(view, children);
 
         if (data.events) on(view, data.events);
@@ -62,6 +59,11 @@ export function Engine(manipulator) {
     }
 
     function replaceChildren(view, newChildren) {
+        if (view.children) {
+            view.children.forEach(child => {
+                remove(child);
+            });
+        }
         view.children = newChildren.map(child => create(child, view))
     }
 
@@ -75,7 +77,7 @@ export function Engine(manipulator) {
         manipulator.removeElement(view.el);
     }
 
-    return { create, update, remove, };
+    return { create, update, remove, replaceChildren };
 }
 
 export function h(type, props, ...children) {

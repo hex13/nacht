@@ -5,13 +5,24 @@ import { isView } from '../view.js';
 import { State } from '../state.js';
 import { merge } from '../objects.js';
 
+function TestElement(type, props = {}) {
+    return {
+        isTestElement: true, type, props,
+    };
+}
 
 describe('Engine', () => {
     let adapter;
     let engine;
+    let events ;
     beforeEach(() => {
+        events = [];
         adapter = {
             updateElement(el, parentEl, newData, oldData) {
+                events.push([
+                    'updateElement',
+                    el, parentEl, structuredClone(newData), structuredClone(oldData),
+                ]);
                 if (!el) {
                     el = {
                         isTestElement: true, type: newData.type, props: {},
@@ -22,8 +33,8 @@ describe('Engine', () => {
                 merge(el.props, structuredClone(newData));
                 return el;
             },
-            removeElement() {
-
+            removeElement(el) {
+                events.push(['removeElement', el]);
             }
         };
         engine = new Engine(adapter);
@@ -191,6 +202,27 @@ describe('Engine', () => {
             type: 'app',
             props: expected,
         });
+    });
+    it('replaceChildren() should remove previous children and create new', () => {
+        const root = engine.create(['main', {}, [
+                ['foo', {}],
+                ['bar', {}],
+            ]]
+        );
+        events = [];
+        engine.replaceChildren(root, [
+            ['baz', {}],
+            ['qwe', {}],
+            ['rty', {}],
+        ]);
+        const mainEl =  TestElement('main', {[TYPE]: 'main'});
+        assert.deepStrictEqual(events, [
+            ['removeElement', TestElement('foo', {[TYPE]: 'foo'})],
+            ['removeElement', TestElement('bar', {[TYPE]: 'bar'})],
+            ['updateElement', null, mainEl, {[TYPE]: 'baz'}, {}],
+            ['updateElement', null, mainEl, {[TYPE]: 'qwe'}, {}],
+            ['updateElement', null, mainEl, {[TYPE]: 'rty'}, {}],
+        ]);
     });
 
     it('should be reactive and automatically update view when State value changes', (done) => {
