@@ -39,22 +39,14 @@ export function Engine(manipulator) {
 
 
     function update(view, updates) {
-        const { resolvedData, deps } = resolveObject(updates, true);
-        const visit = (node, path) => {
-            Object.entries(node).forEach(([k, thing]) => {
-                if (thing.subscribe) {
-                    view.cleanups.push(thing.subscribe((action) => {
-                        const updates = {};
-                        set(updates, path.concat(k), action.newValue);
-                        rawUpdate(view, updates);
-                    }));
-                } else if (thing && typeof thing == 'object') {
-                    visit(thing, path.concat(k));
-                }
-            });
-        };
-        visit(deps, []);
-        merge(view.deps, deps);
+        const { resolvedData, deps } = resolveObject(updates);
+        deps.forEach(([path, state]) => {
+            view.cleanups.push(state.subscribe(action => {
+                const updates = {};
+                set(updates, path, action.newValue);
+                rawUpdate(view, updates);
+            }));
+        });
         rawUpdate(view, resolvedData);
     }
 

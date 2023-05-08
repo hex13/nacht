@@ -14,21 +14,19 @@ should return:
 
 export function resolveObject(object) {
     const resolvedTree = {};
-    const depTree = {};
-    const visit = (node, resolvedObject, deps) => {
+    const deps = [];
+    const visit = (node, resolvedObject, path) => {
         Object.entries(node).forEach(([k, thing]) => {
+            resolvedObject[k] = thing;
             if (thing && thing[IS_STATE]) {
-                deps[k] = thing;
+                deps.push([path.concat(k), thing]);
                 resolvedObject[k] = thing.get();
             } else if (thing && typeof thing == 'object' && !Array.isArray(thing)) {
                 resolvedObject[k] = {};
-                deps[k] = {};
-                visit(thing, resolvedObject[k], deps[k]);
-            } else {
-                resolvedObject[k] = thing;
+                visit(thing, resolvedObject[k], path.concat(k));
             }
         });
     }
-    visit(object, resolvedTree, depTree);
-    return { resolvedData: resolvedTree, deps: depTree };
+    visit(object, resolvedTree, []);
+    return { resolvedData: resolvedTree, deps };
 }

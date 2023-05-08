@@ -7,7 +7,7 @@ describe('resolveObject()', () => {
         const resolved = resolveObject({ax: 123, b: "kotek"});
         const expected = {
             resolvedData: {ax: 123, b: "kotek"},
-            deps: {},
+            deps: [],
         };
         assert.deepStrictEqual(resolved, expected);
     });
@@ -22,9 +22,7 @@ describe('resolveObject()', () => {
         const resolved = resolveObject(createInitialObject());
         const expected = {
             resolvedData: createInitialObject(),
-            deps: {
-                nested: {}
-            },
+            deps: [],
         };
         assert.deepStrictEqual(resolved, expected);
     });
@@ -34,14 +32,14 @@ describe('resolveObject()', () => {
         const resolved = resolveObject({desc: "this is counter", counter, counter2});
         const expected = {
             resolvedData: {desc: "this is counter", counter: 100, counter2: 101},
-            deps: {
-                counter,
-                counter2,
-            },
+            deps: [
+                [['counter'], counter],
+                [['counter2'], counter2],
+            ]
         };
         assert.deepStrictEqual(resolved, expected);
-        assert.strictEqual(resolved.deps.counter, counter);
-        assert.strictEqual(resolved.deps.counter2, counter2);
+        assert.strictEqual(resolved.deps[0][1], counter);
+        assert.strictEqual(resolved.deps[1][1], counter2);
     });
     it('should resolve nested object with primitive values and State objects', () => {
         const season = State('spring');
@@ -62,15 +60,13 @@ describe('resolveObject()', () => {
                     month: 'May',
                 }
             },
-            deps: {
-                time: {
-                    season,
-                    month,
-                }
-            },
+            deps: [
+                [['time', 'season'], season],
+                [['time', 'month'], month],
+            ],
         };
         assert.deepStrictEqual(resolved, expected);
-        assert.strictEqual(resolved.deps.time.season, season);
-        assert.strictEqual(resolved.deps.time.month, month);
+        assert.strictEqual(resolved.deps[0][1], season);
+        assert.strictEqual(resolved.deps[1][1], month);
     });
 });
