@@ -14,9 +14,8 @@ export function Engine(manipulator) {
             return create(type(descData), parent);
         }
         data.type = type;
+        data[CHILDREN] = data[CHILDREN] || children;
         update(view, data);
-        replaceChildren(view, children);
-
         if (data.events) on(view, data.events);
         if (data.onceEvents) on(view, data.onceEvents, true);
         view.initializers.forEach(initializer => initializer(view));
@@ -33,6 +32,9 @@ export function Engine(manipulator) {
         }
         if (view.el !== prevEl) {
             view.emitter = new Emitter(view.el);
+        }
+        if (newData[CHILDREN]) {
+            replaceChildren(view, newData[CHILDREN]);
         }
         merge(data, newData);
     }
@@ -85,3 +87,4 @@ export function h(type, props, ...children) {
 
 export const TYPE = 'type';
 export const FRAGMENT_TYPE = '$fragment';
+export const CHILDREN = '$$children';
