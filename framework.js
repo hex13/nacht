@@ -79,7 +79,7 @@ export function h(type, props, ...children) {
         type,
         props || {},
         children.map(x => {
-            if (typeof x == 'string' || (x && x[IS_STATE])) return ['span', {text: x}];
+            if (typeof x == 'number' || typeof x == 'string' || (x && x[IS_STATE])) return ['span', {text: x}];
             return x;
         })
     ];
