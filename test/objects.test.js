@@ -76,5 +76,16 @@ describe('merge()', () => {
         });
         assert.deepStrictEqual(a, b);
     });
-
+    it('should merge arrays correctly', () => {
+        const a = {};
+        const B = () => ({
+            b: [1, 2],
+            c: {
+                d: [],
+            }
+        });
+        const b = B();
+        merge(a, b)
+        assert.deepStrictEqual(a, b);
+    });
 })
