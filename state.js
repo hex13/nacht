@@ -1,41 +1,31 @@
 export function State(value) {
-    let listeners = [];
     return {
+        listeners: [],
+        value,
         [IS_STATE]: true,
-        get: () => value,
-        trigger(action) {
-            listeners.forEach(listener => {
-                listener(action);
-            });
-        },
-        set(newValue) {
-            trigger(this, {type: 'set', newValue, oldValue: value});
-            value = newValue;
-        },
-        subscribe(listener) {
-            listeners.push(listener);
-            return () => {
-                listeners = listeners.filter(x => x !== listener);
-            };
-        },
-    }
+    };
 }
 
 export const IS_STATE = Symbol('State');
 
-export const subscribe = (state, handler) => {
-    return state.subscribe(handler);
+export const subscribe = (state, listener) => {
+    state.listeners.push(listener);
+    return () => {
+        state.listeners = state.listeners.filter(x => x !== listener);
+    };
 };
-
 
 export const get = (state) => {
-    return state.get();
+    return state.value;
 };
 
-export const set = (state, handler) => {
-    return state.set(handler);
+export const set = (state, newValue) => {
+    trigger(state, {type: 'set', newValue, oldValue: state.value});
+    state.value = newValue;
 };
 
-export const trigger = (state, handler) => {
-    return state.trigger(handler);
+export const trigger = (state, action) => {
+    state.listeners.forEach(listener => {
+        listener(action);
+    });
 };
