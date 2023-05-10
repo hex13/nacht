@@ -25,4 +25,8 @@ export const IS_STATE = Symbol('State');
 
 export const subscribe = (state, handler) => {
     return state.subscribe(handler);
-}
+};
+
+export const set = (state, handler) => {
+    return state.set(handler);
+};

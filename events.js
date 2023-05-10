@@ -1,4 +1,4 @@
-import { State, subscribe } from './state.js';
+import { State, subscribe, set } from './state.js';
 
 export function Emitter(eventTarget) {
     const observables = Object.create(null);
@@ -9,7 +9,7 @@ export function Emitter(eventTarget) {
                 subject = State();
                 if (eventTarget && type.indexOf('$') != 0) {
                     eventTarget.addEventListener(type, (e) => {
-                        subject.set(e);
+                        set(subject, e);
                     });
                 }
             }
@@ -17,7 +17,7 @@ export function Emitter(eventTarget) {
             return subject;
         },
         emit(type, event) {
-            this.on(type).set(event);
+            set(this.on(type), event);
         }
     }
 }

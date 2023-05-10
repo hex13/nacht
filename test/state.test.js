@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, subscribe, IS_STATE } from '../state.js';
+import { State, subscribe, IS_STATE, set } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -8,9 +8,9 @@ describe('State', () => {
     it('.get() should return initial value after creating and it should be possible to .set() and .get() values', () => {
         const state = State(9);
         assert.strictEqual(state.get(), 9);
-        state.set(19);
+        set(state, 19);
         assert.strictEqual(state.get(), 19);
-        state.set(2);
+        set(state, 2);
         assert.strictEqual(state.get(), 2);
     });
     describe('.subscribe() should allow for subscribing and', () => {
@@ -23,9 +23,9 @@ describe('State', () => {
             subscribe(state, action => {
                 events.push(['second', action]);
             });
-            state.set('one beer');
-            state.set('zero beers');
-            state.set('999 beers');
+            set(state, 'one beer');
+            set(state, 'zero beers');
+            set(state, '999 beers');
             setTimeout(() => {
                 assert.deepStrictEqual(events, [
                     ['first', {type: 'set', oldValue: 1, newValue: 'one beer'}],

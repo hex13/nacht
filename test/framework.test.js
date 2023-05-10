@@ -2,7 +2,7 @@ import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
 import { Engine, h, TYPE, FRAGMENT_TYPE, CHILDREN } from '../framework.js';
 import { isView } from '../view.js';
-import { State } from '../state.js';
+import { State, set } from '../state.js';
 import { merge } from '../objects.js';
 
 function TestElement(type, props = {}) {
@@ -251,8 +251,8 @@ describe('Engine', () => {
                 }
             },
         ]);
-        color.set('blue');
-        element.set('water');
+        set(color, 'blue');
+        set(element, 'water');
         setTimeout(() => {
             const expected = {
                 ...ChildrenMixin([]),
