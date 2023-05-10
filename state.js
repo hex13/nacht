@@ -27,6 +27,11 @@ export const subscribe = (state, handler) => {
     return state.subscribe(handler);
 };
 
+
+export const get = (state) => {
+    return state.get();
+};
+
 export const set = (state, handler) => {
     return state.set(handler);
 };

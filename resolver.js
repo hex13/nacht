@@ -1,4 +1,4 @@
-import { IS_STATE, State } from './state.js';
+import { IS_STATE, State, get } from './state.js';
 
 /*
 for tree:
@@ -20,7 +20,7 @@ export function resolveObject(object) {
             resolvedObject[k] = thing;
             if (thing && thing[IS_STATE]) {
                 deps.push([path.concat(k), thing]);
-                resolvedObject[k] = thing.get();
+                resolvedObject[k] = get(thing);
             } else if (thing && typeof thing == 'object' && !Array.isArray(thing)) {
                 resolvedObject[k] = {};
                 visit(thing, resolvedObject[k], path.concat(k));

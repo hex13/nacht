@@ -1,17 +1,17 @@
 import * as assert from 'node:assert';
-import { State, subscribe, IS_STATE, set, trigger } from '../state.js';
+import { State, subscribe, IS_STATE, get, set, trigger } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
         assert.ok(State()[IS_STATE]);
     });
-    it('.get() should return initial value after creating and it should be possible to .set() and .get() values', () => {
+    it('get() should return initial value after creating and it should be possible to .set() and .get() values', () => {
         const state = State(9);
-        assert.strictEqual(state.get(), 9);
+        assert.strictEqual(get(state), 9);
         set(state, 19);
-        assert.strictEqual(state.get(), 19);
+        assert.strictEqual(get(state), 19);
         set(state, 2);
-        assert.strictEqual(state.get(), 2);
+        assert.strictEqual(get(state), 2);
     });
     describe('.subscribe() should allow for subscribing and', () => {
         it('setting new values via .set() should get listeners called', (done) => {
