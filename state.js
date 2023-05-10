@@ -9,7 +9,7 @@ export function State(value) {
             });
         },
         set(newValue) {
-            this.trigger({type: 'set', newValue, oldValue: value})
+            trigger(this, {type: 'set', newValue, oldValue: value});
             value = newValue;
         },
         subscribe(listener) {
@@ -29,4 +29,8 @@ export const subscribe = (state, handler) => {
 
 export const set = (state, handler) => {
     return state.set(handler);
+};
+
+export const trigger = (state, handler) => {
+    return state.trigger(handler);
 };

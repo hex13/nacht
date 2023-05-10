@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, subscribe, IS_STATE, set } from '../state.js';
+import { State, subscribe, IS_STATE, set, trigger } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -38,7 +38,7 @@ describe('State', () => {
                 done();
             }, 0);
         });
-        it('.trigger() should get listeners called with passed action', (done) => {
+        it('trigger() should get listeners called with passed action', (done) => {
             const state = State();
             const events = [];
             subscribe(state, action => {
@@ -47,8 +47,8 @@ describe('State', () => {
             subscribe(state, action => {
                 events.push(['second', action]);
             });
-            state.trigger({type: 'foo', a: 1});
-            state.trigger({type: 'bar', a: 2});
+            trigger(state, {type: 'foo', a: 1});
+            trigger(state, {type: 'bar', a: 2});
 
             setTimeout(() => {
                 assert.deepStrictEqual(events, [
