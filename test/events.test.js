@@ -5,7 +5,7 @@ import {
     on,
     once,
 } from '../events.js';
-import { State, IS_STATE } from '../state.js';
+import { State, IS_STATE, subscribe } from '../state.js';
 
 it('isEventTarget() should correctly decide on whether something is EventTarget-like', () => {
    assert.strictEqual(isEventTarget({}), false);
@@ -47,10 +47,10 @@ describe('Emitter', () => {
     it('.emit() should get called listeners of state', (done) => {
         const emitter = new Emitter();
         const events = [];
-        emitter.on('panda').subscribe(e => {
+        subscribe(emitter.on('panda'), e => {
             events.push(['panda', e]);
         });
-        emitter.on('pannieda').subscribe(e => {
+        subscribe(emitter.on('pannieda'), e => {
             events.push(['pannieda', e]);
         });
         emitter.emit('panda', 2);

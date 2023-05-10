@@ -23,3 +23,6 @@ export function State(value) {
 
 export const IS_STATE = Symbol('State');
 
+export const subscribe = (state, handler) => {
+    return state.subscribe(handler);
+}

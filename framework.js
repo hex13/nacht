@@ -2,7 +2,7 @@ import { resolveObject } from './resolver.js';
 import { View } from './view.js';
 import { Emitter, on } from './events.js';
 import { merge, set } from './objects.js';
-import { IS_STATE } from './state.js';
+import { IS_STATE, subscribe } from './state.js';
 
 
 export function Engine(manipulator) {
@@ -43,7 +43,7 @@ export function Engine(manipulator) {
     function update(view, updates) {
         const { resolvedData, deps } = resolveObject(updates);
         deps.forEach(([path, state]) => {
-            view.cleanups.push(state.subscribe(action => {
+            view.cleanups.push(subscribe(state, action => {
                 const updates = {};
                 set(updates, path, action.newValue);
                 rawUpdate(view, updates);

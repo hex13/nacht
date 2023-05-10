@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, IS_STATE } from '../state.js';
+import { State, subscribe, IS_STATE } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -17,10 +17,10 @@ describe('State', () => {
         it('setting new values via .set() should get listeners called', (done) => {
             const state = State(1);
             const events = [];
-            state.subscribe(action => {
+            subscribe(state, action => {
                 events.push(['first', action]);
             });
-            state.subscribe(action => {
+            subscribe(state, action => {
                 events.push(['second', action]);
             });
             state.set('one beer');
@@ -41,10 +41,10 @@ describe('State', () => {
         it('.trigger() should get listeners called with passed action', (done) => {
             const state = State();
             const events = [];
-            state.subscribe(action => {
+            subscribe(state, action => {
                 events.push(['first', action]);
             });
-            state.subscribe(action => {
+            subscribe(state, action => {
                 events.push(['second', action]);
             });
             state.trigger({type: 'foo', a: 1});

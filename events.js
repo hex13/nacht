@@ -1,4 +1,4 @@
-import { State } from './state.js';
+import { State, subscribe } from './state.js';
 
 export function Emitter(eventTarget) {
     const observables = Object.create(null);
@@ -38,7 +38,7 @@ export function once(target, eventType) {
 export function on(target, events, once = false) {
     Object.entries(events).forEach(([type, listener]) => {
         if (target.emitter) {
-            const dispose = target.emitter.on(type).subscribe(action => {
+            const dispose = subscribe(target.emitter.on(type), action => {
                 listener(action.newValue, target);
                 if (once) dispose();
             });
