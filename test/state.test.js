@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, subscribe, IS_STATE, get, set, trigger } from '../state.js';
+import { State, subscribe, IS_STATE, get, set, trigger, update } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -13,6 +13,19 @@ describe('State', () => {
         set(state, 2);
         assert.strictEqual(get(state), 2);
     });
+    it('update() should update object with handler', (done) => {
+        const state = State({x: 12, y: 101});
+        subscribe(state, (action) => {
+            assert.deepEqual(get(state), {x: 102, y: 101});
+            assert.deepEqual(action.newValue, {x: 102, y: 101});
+            done();
+        });
+
+        update(state, d => {
+            d.x = d.y + 1;
+        });
+    });
+
     describe('.subscribe() should allow for subscribing and', () => {
         it('setting new values via .set() should get listeners called', (done) => {
             const state = State(1);

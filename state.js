@@ -29,3 +29,9 @@ export const trigger = (state, action) => {
         listener(action);
     });
 };
+
+export const update = (state, handler) => {
+    handler(get(state));
+    const newValue = get(state);
+    trigger(state, {type: 'set', newValue, oldValue: state.value});
+}
