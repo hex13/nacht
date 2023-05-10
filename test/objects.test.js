@@ -1,7 +1,7 @@
 import * as assert from 'node:assert';
-import { set, merge } from '../objects.js';
+import { setProperty, merge } from '../objects.js';
 
-describe('set()', () => {
+describe('setProperty()', () => {
     it('should set existing properties', () => {
         const create = () => ({
             a: {
@@ -12,8 +12,8 @@ describe('set()', () => {
         });
         const a = create();
         const b = create();
-        set(a, ['c'], 13);
-        set(a, ['a', 'b'], 3);
+        setProperty(a, ['c'], 13);
+        setProperty(a, ['a', 'b'], 3);
         b.c = 13;
         b.a.b = 3;
         assert.deepStrictEqual(a, b);
@@ -21,7 +21,7 @@ describe('set()', () => {
     it('should set non-existing properties', () => {
         const a = {};
         const b = {foo: {bar: 9}};
-        set(a, ['foo', 'bar'], 9);
+        setProperty(a, ['foo', 'bar'], 9);
         assert.deepStrictEqual(a, b);
     });
 });

@@ -1,4 +1,4 @@
-export function set(o, path, v) {
+export function setProperty(o, path, v) {
     const [k, ...rest] = path;
     if (path.length == 1) {
         o[k] = v;
@@ -6,7 +6,7 @@ export function set(o, path, v) {
         if (o[k] == undefined) {
             o[k] = {};
         }
-        set(o[k], rest, v);
+        setProperty(o[k], rest, v);
     }
 }
 
