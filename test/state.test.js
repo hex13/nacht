@@ -5,13 +5,21 @@ describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
         assert.ok(State()[IS_STATE]);
     });
-    it('get() should return initial value after creating and it should be possible to .set() and .get() values', () => {
+    it('get() should return initial *primitive* value after creating and it should be possible to set() and get() values', () => {
         const state = State(9);
         assert.strictEqual(get(state), 9);
         set(state, 19);
         assert.strictEqual(get(state), 19);
         set(state, 2);
         assert.strictEqual(get(state), 2);
+    });
+    it('get() should return initial *object* value after creating and it should be possible to set() and get() values', () => {
+        const state = State({x: 1, y: 10});
+        assert.deepEqual(get(state), {x: 1, y: 10});
+        set(state, {x: 2, z: 19});
+        assert.deepEqual(get(state), {x: 2, z: 19});
+        set(state, {x: 3})
+        assert.deepEqual(get(state), {x: 3});
     });
     it('update() should update object with handler', (done) => {
         const state = State({x: 12, y: 101});
