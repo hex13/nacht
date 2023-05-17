@@ -1,8 +1,15 @@
 import * as objectUtils from './objects.js';
-export function State(value) {
+import { resolveObject } from './resolver.js';
+
+export function State(initialState) {
+    if (initialState && typeof initialState == 'object') {
+        const { resolvedData } = resolveObject(initialState);
+        initialState = resolvedData;
+    }
+
     return {
         listeners: [],
-        value,
+        value: initialState,
         [IS_STATE]: true,
     };
 }

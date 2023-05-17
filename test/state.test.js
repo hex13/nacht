@@ -2,6 +2,7 @@ import * as assert from 'node:assert';
 import { State, subscribe, IS_STATE, get, set, trigger, update } from '../state.js';
 import { merge } from '../objects.js';
 import { merge as mergeState } from '../state.js';
+import { resolveObject } from '../resolver.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -118,5 +119,28 @@ describe('State', () => {
                 done();
             }, 0);
         });
-    })
+    });
+
+    describe('recursive state', () => {
+        it('should resolve initial state', () => {
+            const foo = State(0);
+            const bar = State(100);
+            const deeper = State(':)');
+
+            const createInitialState = () => {
+                return {
+                    foo,
+                    bar,
+                    deep: {
+                        deeper,
+                    }
+                };
+            }
+
+            const state = State(createInitialState());
+
+            const expected = resolveObject(createInitialState()).resolvedData;
+            assert.deepStrictEqual(get(state), expected);
+        });
+    });
 });
