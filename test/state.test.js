@@ -142,5 +142,30 @@ describe('State', () => {
             const expected = resolveObject(createInitialState()).resolvedData;
             assert.deepStrictEqual(get(state), expected);
         });
+
+        it('should subscribe to dependencies and merge updates reactively', (done) => {
+            const foo = State(0);
+            const bar = State(100);
+            const deeper = State(':)');
+
+            const createInitialState = () => {
+                return {
+                    foo,
+                    bar,
+                    deep: {
+                        deeper,
+                    }
+                };
+            };
+
+            const state = State(createInitialState());
+            set(foo, 5423);
+            set(deeper, 'kotek');
+            setTimeout(() => {
+                const expected = resolveObject(createInitialState()).resolvedData;
+                assert.deepStrictEqual(get(state), expected);
+                done();
+            }, 0);
+        });
     });
 });

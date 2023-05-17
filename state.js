@@ -3,13 +3,19 @@ import { resolveObject } from './resolver.js';
 
 export function State(initialState) {
     if (initialState && typeof initialState == 'object') {
-        const { resolvedData } = resolveObject(initialState);
+        const { resolvedData, deps } = resolveObject(initialState);
+        deps.forEach(([path, state]) => {
+            subscribe(state, action => {
+                objectUtils.setProperty(value, path, action.newValue);
+            });
+        });
         initialState = resolvedData;
     }
+    const value = initialState;
 
     return {
         listeners: [],
-        value: initialState,
+        value,
         [IS_STATE]: true,
     };
 }
