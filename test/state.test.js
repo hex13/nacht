@@ -1,5 +1,7 @@
 import * as assert from 'node:assert';
 import { State, subscribe, IS_STATE, get, set, trigger, update } from '../state.js';
+import { merge } from '../objects.js';
+import { merge as mergeState } from '../state.js';
 
 describe('State', () => {
     it('should have non-falsy [IS_STATE] property', () => {
@@ -32,6 +34,22 @@ describe('State', () => {
         update(state, d => {
             d.x = d.y + 1;
         });
+    });
+    it('state merge() should merge updates into state in a way that is consistent with objectUtils.merge()', (done) => {
+        const createData = () => ({
+            player: {
+                name: 'Alice',
+                points: 191,
+            }
+        });
+        const state = State(createData());
+        mergeState(state, {player: {points: 200}});
+        const expected = createData();
+        merge(expected, {player: {points: 200}});
+        setTimeout(() => {
+            assert.deepEqual(get(state), expected);
+            done();
+        }, 0);
     });
 
     describe('.subscribe() should allow for subscribing and', () => {

@@ -1,3 +1,4 @@
+import * as objectUtils from './objects.js';
 export function State(value) {
     return {
         listeners: [],
@@ -35,3 +36,9 @@ export const update = (state, handler) => {
     const newValue = get(state);
     trigger(state, {type: 'set', newValue, oldValue: state.value});
 }
+
+export const merge = (state, props) => {
+    update(state, d => {
+        objectUtils.merge(d, props);
+    })
+};
