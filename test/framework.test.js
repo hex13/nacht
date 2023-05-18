@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
-import { Engine, h, TYPE, FRAGMENT_TYPE, CHILDREN } from '../framework.js';
+import { Engine, h, TYPE, FRAGMENT_TYPE, CHILDREN, createViewData } from '../framework.js';
 import { isView } from '../view.js';
 import { State, set } from '../state.js';
 import { merge } from '../objects.js';
@@ -12,7 +12,7 @@ function TestElement(type, props = {}) {
 }
 
 const clone = o => JSON.parse(JSON.stringify(o));
-const ChildrenMixin = (children) => ({[CHILDREN]: children});
+
 describe('Engine', () => {
     let adapter;
     let engine;
@@ -52,25 +52,17 @@ describe('Engine', () => {
         const props = createTestProps();
         const root = engine.create(['div', props]);
         assert.ok(isView(root));
-        assert.deepStrictEqual(root.data, {
-            type: 'div',
-            ...ChildrenMixin([]),
+        const viewData =  createViewData('div', {
             foo: 'wchodzi kotek',
             abc: {
                 def: 91,
             }
-        });
+        }, []);
+        assert.deepStrictEqual(root.data, viewData);
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'div',
-            props: {
-                type: 'div',
-                ...ChildrenMixin([]),
-                foo: 'wchodzi kotek',
-                abc: {
-                    def: 91,
-                }
-            }
+            props: viewData,
         });
         assert.notStrictEqual(root.data, props);
         assert.notStrictEqual(root.data.abc, props.abc);
@@ -105,20 +97,17 @@ describe('Engine', () => {
         const componentRoot = root.children[0];
         assert.strictEqual(componentRoot.parent, root);
 
-        assert.deepStrictEqual(componentRoot.data, {
-            [TYPE]: 'app',
-            ...ChildrenMixin(ChildrenDesc()),
-            abc: 'xyz',
-        });
+        const viewData = createViewData('app', {abc: 'xyz'}, ChildrenDesc());
+        assert.deepStrictEqual(componentRoot.data, viewData);
         assert.deepStrictEqual(componentRoot.el, {
             isTestElement: true,
             [TYPE]: 'app',
-            props: {type: 'app', abc: 'xyz', ...ChildrenMixin(ChildrenDesc())},
+            props: viewData,
         });
 
         assert.strictEqual(componentRoot.children.length, 2);
-        assert.deepStrictEqual(componentRoot.children[0].data, {[TYPE]: 'child1', foo: 'hello', ...ChildrenMixin([])});
-        assert.deepStrictEqual(componentRoot.children[1].data, {[TYPE]: 'child2', foo: 'hello2', ...ChildrenMixin([]),});
+        assert.deepStrictEqual(componentRoot.children[0].data, createViewData('child1', {foo: 'hello'}, []));
+        assert.deepStrictEqual(componentRoot.children[1].data, createViewData('child2', {foo: 'hello2'}, []));
     });
 
     it('create() should create children views', () => {
@@ -130,37 +119,27 @@ describe('Engine', () => {
             'main', {someProp: {abc: 1}}, ChildrenDesc(),
         ]);
         assert.strictEqual(root.children.length, 2);
-        assert.deepStrictEqual(root.data, {
-            type: 'main',
-            ...ChildrenMixin(ChildrenDesc()),
-            someProp: {abc: 1},
-        });
+        assert.deepStrictEqual(root.data, createViewData('main', {someProp: {abc: 1}}, ChildrenDesc()));
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'main',
-            props: {type: 'main', ...ChildrenMixin(ChildrenDesc()), someProp: {abc: 1}},
+            props: createViewData('main', {someProp: {abc: 1}}, ChildrenDesc()),
         });
 
-        assert.deepStrictEqual(root.children[0].data, {
-            type: 'foo',
-            ...ChildrenMixin([]),
-            yo: 'hey',
-        });
+        let viewData = createViewData('foo', {yo: 'hey'}, []);
+        assert.deepStrictEqual(root.children[0].data, viewData);
         assert.deepStrictEqual(root.children[0].el, {
             isTestElement: true,
             type: 'foo',
-            props: {type: 'foo', yo: 'hey', ...ChildrenMixin([])},
+            props: viewData,
         });
 
-        assert.deepStrictEqual(root.children[1].data, {
-            type: 'bar',
-            ...ChildrenMixin([]),
-            hey: 'yo',
-        });
+        viewData = createViewData('bar', {hey: 'yo'}, []);
+        assert.deepStrictEqual(root.children[1].data, viewData);
         assert.deepStrictEqual(root.children[1].el, {
             isTestElement: true,
             type: 'bar',
-            props: {type: 'bar', hey: 'yo', ...ChildrenMixin([])},
+            props: viewData,
         });
     });
     it('create() should create fragment', () => {
@@ -196,9 +175,7 @@ describe('Engine', () => {
                 tief: 102,
             }
         });
-        const expected = {
-            type: 'app',
-            ...ChildrenMixin([]),
+        const expected = createViewData('app', {
             foo: 'whoa',
             counter: 11,
             bar: 'baz',
@@ -207,7 +184,7 @@ describe('Engine', () => {
                 deep: 101,
                 tief: 102,
             }
-        };
+        }, []);
         assert.deepStrictEqual(root.data, expected);
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
@@ -228,14 +205,14 @@ describe('Engine', () => {
             ['rty', {}],
         ]);
 
-        const mainEl =  TestElement('main', {[TYPE]: 'main', ...ChildrenMixin([['foo', {}],['bar', {}]])});
+        const mainEl =  TestElement('main', createViewData('main', {}, [['foo', {}],['bar', {}]]));
 
         assert.deepStrictEqual(events, [
-            ['removeElement', TestElement('foo', {[TYPE]: 'foo', ...ChildrenMixin([])})],
-            ['removeElement', TestElement('bar', {[TYPE]: 'bar', ...ChildrenMixin([])})],
-            ['updateElement', null, mainEl, {[TYPE]: 'baz', ...ChildrenMixin([])}, {}],
-            ['updateElement', null, mainEl, {[TYPE]: 'qwe', ...ChildrenMixin([])}, {}],
-            ['updateElement', null, mainEl, {[TYPE]: 'rty', ...ChildrenMixin([])}, {}],
+            ['removeElement', TestElement('foo', createViewData('foo', {}, []))],
+            ['removeElement', TestElement('bar', createViewData('bar', {}, []))],
+            ['updateElement', null, mainEl, createViewData('baz', {}, []), {}],
+            ['updateElement', null, mainEl, createViewData('qwe', {}, []), {}],
+            ['updateElement', null, mainEl, createViewData('rty', {}, []), {}],
         ]);
     });
 
@@ -254,15 +231,13 @@ describe('Engine', () => {
         set(color, 'blue');
         set(element, 'water');
         setTimeout(() => {
-            const expected = {
-                ...ChildrenMixin([]),
-                type: 'app',
+            const expected = createViewData('app', {
                 foo: 'whoa',
                 color: 'blue',
                 nested: {
                     element: 'water',
                 },
-            };
+            }, []);
             assert.deepStrictEqual(root.data, expected);
             assert.deepStrictEqual(root.el, {
                 isTestElement: true,

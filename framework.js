@@ -85,6 +85,14 @@ export function h(type, props, ...children) {
     ];
 };
 
+export function createViewData(type, props, children) {
+    return {
+        ...props,
+        [TYPE]: type,
+        [CHILDREN]: children,
+    };
+}
+
 export const TYPE = 'type';
 export const FRAGMENT_TYPE = '$fragment';
 export const CHILDREN = '$$children';
