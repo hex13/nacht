@@ -9,12 +9,10 @@ export function Engine(manipulator) {
     function create(desc, parent) {
         const view = new View(parent);
         const [type, descData, children = []] = desc;
-        const data = {...descData};
         if (typeof type == 'function') {
             return create(type(descData), parent);
         }
-        data.type = type;
-        data[CHILDREN] = data[CHILDREN] || children;
+        const data = createViewData(type, descData, children);
         update(view, data);
         if (data.events) on(view, data.events);
         if (data.onceEvents) on(view, data.onceEvents, true);
