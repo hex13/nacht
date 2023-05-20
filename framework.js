@@ -2,7 +2,7 @@ import { resolveObject } from './resolver.js';
 import { View } from './view.js';
 import { Emitter, on } from './events.js';
 import { merge, setProperty } from './objects.js';
-import { IS_STATE, subscribe } from './state.js';
+import { IS_STATE, subscribe, State, get } from './state.js';
 
 
 export function Engine(manipulator) {
@@ -12,8 +12,13 @@ export function Engine(manipulator) {
         if (typeof type == 'function') {
             return create(type(descData), parent);
         }
-        const data = createViewData(type, descData, children);
-        update(view, data);
+        const data = {};
+        view.state = State(createViewData(type, descData, children));
+        // TODO tests for cleanups
+        view.cleanups.push(subscribe(view.state, action => {
+            rawUpdate(view, action.updates);
+        }));
+        rawUpdate(view, get(view.state));
         if (data.events) on(view, data.events);
         if (data.onceEvents) on(view, data.onceEvents, true);
         view.initializers.forEach(initializer => initializer(view));
@@ -40,13 +45,6 @@ export function Engine(manipulator) {
 
     function update(view, updates) {
         const { resolvedData, deps } = resolveObject(updates);
-        deps.forEach(([path, state]) => {
-            view.cleanups.push(subscribe(state, action => {
-                const updates = {};
-                setProperty(updates, path, action.newValue);
-                rawUpdate(view, updates);
-            }));
-        });
         rawUpdate(view, resolvedData);
     }
 
