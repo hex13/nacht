@@ -2,25 +2,29 @@ import * as objectUtils from './objects.js';
 import { resolveObject } from './resolver.js';
 
 export function State(initialState) {
+    let root;
     if (initialState && typeof initialState == 'object') {
         const { resolvedData, deps } = resolveObject(initialState);
+        root = resolvedData;
         deps.forEach(([path, state]) => {
-            subscribe(state, action => {
-                objectUtils.setProperty(value, path, action.newValue);
-            });
+            subscribe(state, PropertySetterListener(root, path));
         });
-        initialState = resolvedData;
+    } else {
+        root = initialState;
     }
-    const value = initialState;
 
     return {
         listeners: [],
-        value,
+        value: root,
         [IS_STATE]: true,
     };
 }
 
 export const IS_STATE = Symbol('State');
+
+export const PropertySetterListener = (root, path) => {
+    return (action) => objectUtils.setProperty(root, path, action.newValue);
+}
 
 export const subscribe = (state, listener) => {
     state.listeners.push(listener);
