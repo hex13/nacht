@@ -8,16 +8,22 @@ export function State(initialState) {
         root = resolvedData;
         deps.forEach(([path, state]) => {
             subscribe(state, PropertySetterListener(root, path));
+            subscribe(state, action => {
+                const updates = {};
+                objectUtils.setProperty(updates, path, action.newValue);
+                trigger(rootState, { updates });
+            });
         });
     } else {
         root = initialState;
     }
 
-    return {
+    const rootState = {
         listeners: [],
         value: root,
         [IS_STATE]: true,
     };
+    return rootState;
 }
 
 export const IS_STATE = Symbol('State');

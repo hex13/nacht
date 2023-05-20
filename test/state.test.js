@@ -167,5 +167,32 @@ describe('State', () => {
                 done();
             }, 0);
         });
+
+        it('update of dependency should trigger listener of parent state', (done) => {
+            const foo = State(0);
+            const bar = State(100);
+            const deeper = State(':)');
+
+            const createInitialState = () => {
+                return {
+                    foo,
+                    bar,
+                    deep: {
+                        deeper,
+                    }
+                };
+            };
+            const state = State(createInitialState());
+            subscribe(state, (action) => {
+                assert.deepStrictEqual(action.updates, {
+                    deep: {
+                        deeper: 'kotek',
+                    }
+                });
+                done();
+            })
+
+            set(deeper, 'kotek');
+        });
     });
 });
