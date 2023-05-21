@@ -148,6 +148,7 @@ describe('Engine', () => {
         ]);
         const fragment = root.children[1];
         assert.deepStrictEqual(fragment.data[TYPE], FRAGMENT_TYPE);
+        assert.strictEqual(fragment.children.length, 2);
         assert.strictEqual(fragment.el, root.el);
     });
     it('update() should update view', () => {
