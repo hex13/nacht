@@ -6,6 +6,7 @@ export const createDomManipulator = (document) => ({
         return el;
     },
     updateElement(el, parentEl, newData, oldData) {
+        // TODO fix oldData
         if (!el) {
             el = this.createElement(newData.type, parentEl);
         }

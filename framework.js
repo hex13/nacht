@@ -17,7 +17,7 @@ export function Engine(manipulator) {
         view.state = State(desc);
         // TODO tests for cleanups
         view.cleanups.push(subscribe(view.state, action => {
-            rawUpdate(view, action.updates);
+            rawUpdate(view, action.updates || action.newValue);
         }));
         rawUpdate(view, get(view.state));
         if (data.events) on(view, data.events);
@@ -27,12 +27,11 @@ export function Engine(manipulator) {
     }
 
     function rawUpdate(view, newData) {
-        const { data } = view;
         const prevEl = view.el;
         if (newData[TYPE] == FRAGMENT_TYPE) {
             view.el = view.parent.el;
         } else {
-            view.el = manipulator.updateElement(view.el, view.parent?.el, newData, data);
+            view.el = manipulator.updateElement(view.el, view.parent?.el, newData, {});
         }
         if (view.el !== prevEl) {
             view.emitter = new Emitter(view.el);
@@ -40,7 +39,6 @@ export function Engine(manipulator) {
         if (newData[CHILDREN]) {
             replaceChildren(view, newData[CHILDREN]);
         }
-        merge(data, newData);
     }
 
     function replaceChildren(view, newChildren) {

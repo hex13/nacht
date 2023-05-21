@@ -2,7 +2,7 @@ import * as assert from 'node:assert';
 import { resolveObject } from '../resolver.js';
 import { Engine, h, TYPE, FRAGMENT_TYPE, CHILDREN, createViewData } from '../framework.js';
 import { isView } from '../view.js';
-import { State, set } from '../state.js';
+import { State, set, get, merge as mergeState } from '../state.js';
 import { merge } from '../objects.js';
 
 function TestElement(type, props = {}) {
@@ -13,7 +13,7 @@ function TestElement(type, props = {}) {
 
 const clone = o => JSON.parse(JSON.stringify(o));
 const test_getViewData = view => {
-    return view.data;
+    return get(view.state)
 }
 
 describe('Engine', () => {
@@ -154,6 +154,42 @@ describe('Engine', () => {
         assert.deepStrictEqual(test_getViewData(fragment)[TYPE], FRAGMENT_TYPE);
         assert.strictEqual(fragment.children.length, 2);
         assert.strictEqual(fragment.el, root.el);
+    });
+    it('update() should update view', () => {
+        const root = engine.create(h(
+            'app', {
+                foo: 'whoa',
+                counter: 10,
+                some: {
+                    deep: 101,
+                    tief: 100,
+                },
+                reactive: State('red'),
+            },
+        ));
+        mergeState(root.state, {
+            bar: 'baz',
+            counter: 11,
+            some: {
+                tief: 102,
+            }
+        });
+        const expected = createViewData('app', {
+            foo: 'whoa',
+            counter: 11,
+            bar: 'baz',
+            reactive: 'red',
+            some: {
+                deep: 101,
+                tief: 102,
+            }
+        }, []);
+        assert.deepStrictEqual(test_getViewData(root), expected);
+        assert.deepStrictEqual(root.el, {
+            isTestElement: true,
+            type: 'app',
+            props: expected,
+        });
     });
     it('replaceChildren() should remove previous children and create new', () => {
         const root = engine.create(h('main', {},
