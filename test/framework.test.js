@@ -155,42 +155,6 @@ describe('Engine', () => {
         assert.strictEqual(fragment.children.length, 2);
         assert.strictEqual(fragment.el, root.el);
     });
-    it('update() should update view', () => {
-        const root = engine.create(h(
-            'app', {
-                foo: 'whoa',
-                counter: 10,
-                some: {
-                    deep: 101,
-                    tief: 100,
-                },
-                reactive: State('red'),
-            },
-        ));
-        engine.update(root, {
-            bar: 'baz',
-            counter: 11,
-            some: {
-                tief: 102,
-            }
-        });
-        const expected = createViewData('app', {
-            foo: 'whoa',
-            counter: 11,
-            bar: 'baz',
-            reactive: 'red',
-            some: {
-                deep: 101,
-                tief: 102,
-            }
-        }, []);
-        assert.deepStrictEqual(test_getViewData(root), expected);
-        assert.deepStrictEqual(root.el, {
-            isTestElement: true,
-            type: 'app',
-            props: expected,
-        });
-    });
     it('replaceChildren() should remove previous children and create new', () => {
         const root = engine.create(h('main', {},
                 h('foo', {}),

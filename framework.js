@@ -43,12 +43,6 @@ export function Engine(manipulator) {
         merge(data, newData);
     }
 
-
-    function update(view, updates) {
-        const { resolvedData, deps } = resolveObject(updates);
-        rawUpdate(view, resolvedData);
-    }
-
     function replaceChildren(view, newChildren) {
         if (view.children) {
             view.children.forEach(child => {
@@ -68,7 +62,7 @@ export function Engine(manipulator) {
         manipulator.removeElement(view.el);
     }
 
-    return { create, update, remove, replaceChildren };
+    return { create, remove, replaceChildren };
 }
 
 export function h(type, props, ...children) {
