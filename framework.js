@@ -8,10 +8,11 @@ import { IS_STATE, subscribe, State, get } from './state.js';
 export function Engine(manipulator) {
     function create(desc, parent) {
         // TODO handling cases of creating views for strings, numbers, observables
-        const view = new View(parent);
         if (typeof desc.type == 'function') {
             return create(desc.type(desc), parent);
         }
+
+        const view = new View(parent);
         const data = {};
         view.state = State(desc);
         // TODO tests for cleanups

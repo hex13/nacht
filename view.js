@@ -5,7 +5,6 @@ export function View(parent) {
         [IS_VIEW]: true,
         parent,
         data: {},
-        deps: {},
         cleanups: [],
         initializers: [],
         el: null,
