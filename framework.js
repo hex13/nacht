@@ -7,13 +7,13 @@ import { IS_STATE, subscribe, State, get } from './state.js';
 
 export function Engine(manipulator) {
     function create(desc, parent) {
+        // TODO handling cases of creating views for strings, numbers, observables
         const view = new View(parent);
-        const [type, descData, children = []] = desc;
-        if (typeof type == 'function') {
-            return create(type(descData), parent);
+        if (typeof desc.type == 'function') {
+            return create(desc.type(desc), parent);
         }
         const data = {};
-        view.state = State(createViewData(type, descData, children));
+        view.state = State(desc);
         // TODO tests for cleanups
         view.cleanups.push(subscribe(view.state, action => {
             rawUpdate(view, action.updates);
@@ -71,14 +71,7 @@ export function Engine(manipulator) {
 }
 
 export function h(type, props, ...children) {
-    return [
-        type,
-        props || {},
-        children.map(x => {
-            if (typeof x == 'number' || typeof x == 'string' || (x && x[IS_STATE])) return ['span', {text: x}];
-            return x;
-        })
-    ];
+    return createViewData(type, props, children);
 };
 
 export function createViewData(type, props, children) {
