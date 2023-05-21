@@ -4,16 +4,11 @@ export function View(parent) {
     return {
         [IS_VIEW]: true,
         parent,
-        data: {},
         cleanups: [],
-        initializers: [],
         el: null,
         emitter: null,
         withCleanup(cleanup) {
             this.cleanups.push(cleanup);
-        },
-        onCreate(initializer) {
-            this.initializers.push(initializer);
         },
     };
 }

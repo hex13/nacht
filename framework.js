@@ -13,16 +13,12 @@ export function Engine(manipulator) {
         }
 
         const view = new View(parent);
-        const data = {};
         view.state = State(desc);
         // TODO tests for cleanups
         view.cleanups.push(subscribe(view.state, action => {
             rawUpdate(view, action.updates || action.newValue);
         }));
         rawUpdate(view, get(view.state));
-        if (data.events) on(view, data.events);
-        if (data.onceEvents) on(view, data.onceEvents, true);
-        view.initializers.forEach(initializer => initializer(view));
         return view;
     }
 
