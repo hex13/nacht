@@ -12,6 +12,9 @@ function TestElement(type, props = {}) {
 }
 
 const clone = o => JSON.parse(JSON.stringify(o));
+const test_getViewData = view => {
+    return view.data;
+}
 
 describe('Engine', () => {
     let adapter;
@@ -58,14 +61,15 @@ describe('Engine', () => {
                 def: 91,
             }
         }, []);
-        assert.deepStrictEqual(root.data, viewData);
+        const rootData = test_getViewData(root);
+        assert.deepStrictEqual(rootData, viewData);
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'div',
             props: viewData,
         });
-        assert.notStrictEqual(root.data, props);
-        assert.notStrictEqual(root.data.abc, props.abc);
+        assert.notStrictEqual(rootData, props);
+        assert.notStrictEqual(rootData.abc, props.abc);
         assert.deepStrictEqual(props, createTestProps());
     });
     it('create() should accept function as a type and handle it as component', () => {
@@ -92,7 +96,7 @@ describe('Engine', () => {
         assert.strictEqual(componentRoot.parent, root);
 
         const viewData = createViewData('app', {abc: 'xyz'}, Children());
-        assert.deepStrictEqual(componentRoot.data, viewData);
+        assert.deepStrictEqual(test_getViewData(componentRoot), viewData);
         assert.deepStrictEqual(componentRoot.el, {
             isTestElement: true,
             [TYPE]: 'app',
@@ -100,8 +104,8 @@ describe('Engine', () => {
         });
 
         assert.strictEqual(componentRoot.children.length, 2);
-        assert.deepStrictEqual(componentRoot.children[0].data, createViewData('child1', {foo: 'hello'}, []));
-        assert.deepStrictEqual(componentRoot.children[1].data, createViewData('child2', {foo: 'hello2'}, []));
+        assert.deepStrictEqual(test_getViewData(componentRoot.children[0]), createViewData('child1', {foo: 'hello'}, []));
+        assert.deepStrictEqual(test_getViewData(componentRoot.children[1]), createViewData('child2', {foo: 'hello2'}, []));
     });
 
     it('create() should create children views', () => {
@@ -113,7 +117,7 @@ describe('Engine', () => {
             h('main', {someProp: {abc: 1}}, ...Children()),
         );
         assert.strictEqual(root.children.length, 2);
-        assert.deepStrictEqual(root.data, createViewData('main', {someProp: {abc: 1}}, Children()));
+        assert.deepStrictEqual(test_getViewData(root), createViewData('main', {someProp: {abc: 1}}, Children()));
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'main',
@@ -121,7 +125,7 @@ describe('Engine', () => {
         });
 
         let viewData = createViewData('foo', {yo: 'hey'}, []);
-        assert.deepStrictEqual(root.children[0].data, viewData);
+        assert.deepStrictEqual(test_getViewData(root.children[0]), viewData);
         assert.deepStrictEqual(root.children[0].el, {
             isTestElement: true,
             type: 'foo',
@@ -129,7 +133,7 @@ describe('Engine', () => {
         });
 
         viewData = createViewData('bar', {hey: 'yo'}, []);
-        assert.deepStrictEqual(root.children[1].data, viewData);
+        assert.deepStrictEqual(test_getViewData(root.children[1]), viewData);
         assert.deepStrictEqual(root.children[1].el, {
             isTestElement: true,
             type: 'bar',
@@ -147,7 +151,7 @@ describe('Engine', () => {
             ),
         );
         const fragment = root.children[1];
-        assert.deepStrictEqual(fragment.data[TYPE], FRAGMENT_TYPE);
+        assert.deepStrictEqual(test_getViewData(fragment)[TYPE], FRAGMENT_TYPE);
         assert.strictEqual(fragment.children.length, 2);
         assert.strictEqual(fragment.el, root.el);
     });
@@ -180,7 +184,7 @@ describe('Engine', () => {
                 tief: 102,
             }
         }, []);
-        assert.deepStrictEqual(root.data, expected);
+        assert.deepStrictEqual(test_getViewData(root), expected);
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'app',
@@ -233,7 +237,7 @@ describe('Engine', () => {
                     element: 'water',
                 },
             }, []);
-            assert.deepStrictEqual(root.data, expected);
+            assert.deepStrictEqual(test_getViewData(root), expected);
             assert.deepStrictEqual(root.el, {
                 isTestElement: true,
                 type: 'app',
