@@ -137,15 +137,15 @@ describe('Engine', () => {
         });
     });
     it('create() should create fragment', () => {
-        const root = engine.create([
-            'main', {}, [
-                ['foo1', {}],
-                [FRAGMENT_TYPE, {}, [
+        const root = engine.create(
+            h('main', {},
+                h('foo1', {}),
+                h(FRAGMENT_TYPE, {},
                     ['foo2', {}],
                     ['foo3', {}],
-                ]],
-            ]
-        ]);
+                ),
+            ),
+        );
         const fragment = root.children[1];
         assert.deepStrictEqual(fragment.data[TYPE], FRAGMENT_TYPE);
         assert.strictEqual(fragment.children.length, 2);
@@ -188,19 +188,19 @@ describe('Engine', () => {
         });
     });
     it('replaceChildren() should remove previous children and create new', () => {
-        const root = engine.create(['main', {}, [
-                ['foo', {}],
-                ['bar', {}],
-            ]]
+        const root = engine.create(h('main', {},
+                h('foo', {}),
+                h('bar', {}),
+            )
         );
         events = [];
         engine.replaceChildren(root, [
-            ['baz', {}],
-            ['qwe', {}],
-            ['rty', {}],
+            h('baz', {}),
+            h('qwe', {}),
+            h('rty', {}),
         ]);
 
-        const mainEl =  TestElement('main', createViewData('main', {}, [['foo', {}],['bar', {}]]));
+        const mainEl =  TestElement('main', createViewData('main', {}, [h('foo', {}),h('bar', {})]));
 
         assert.deepStrictEqual(events, [
             ['removeElement', TestElement('foo', createViewData('foo', {}, []))],
@@ -214,15 +214,15 @@ describe('Engine', () => {
     it('should be reactive and automatically update view when State value changes', (done) => {
         const color = State('red');
         const element = State('fire');
-        const root = engine.create([
-            'app', {
+        const root = engine.create(
+            h('app', {
                 foo: 'whoa',
                 color,
                 nested: {
                     element,
                 }
-            },
-        ]);
+            })
+        );
         set(color, 'blue');
         set(element, 'water');
         setTimeout(() => {
