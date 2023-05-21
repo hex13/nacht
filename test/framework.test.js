@@ -50,7 +50,7 @@ describe('Engine', () => {
             }
         });
         const props = createTestProps();
-        const root = engine.create(['div', props]);
+        const root = engine.create(h('div', props));
         assert.ok(isView(root));
         const viewData =  createViewData('div', {
             foo: 'wchodzi kotek',
@@ -70,24 +70,18 @@ describe('Engine', () => {
     });
     it('create() should accept function as a type and handle it as component', () => {
         const events = [];
-        const ChildrenDesc = () => [
-            ['child1', {foo: 'hello'}],
-            ['child2', {foo: 'hello2'}],
+        const Children = () => [
+            h('child1', {foo: 'hello'}),
+            h('child2', {foo: 'hello2'}),
         ];
 
         const Foo = (props) => {
             events.push(['Foo', props]);
-            return [
-                'app',
-                {abc: 'xyz'},
-                ChildrenDesc(),
-            ]
+            return h('app', {abc: 'xyz'}, ...Children());
         };
-        const root = engine.create([
-            'main', {}, [
-                [Foo, {year: 2023}]
-            ]
-        ]);
+        const root = engine.create(
+            h('main', {}, h(Foo, {year: 2023}))
+        );
         assert.ok(isView(root));
         assert.deepStrictEqual(events, [
             ['Foo', {year: 2023}],
@@ -97,7 +91,7 @@ describe('Engine', () => {
         const componentRoot = root.children[0];
         assert.strictEqual(componentRoot.parent, root);
 
-        const viewData = createViewData('app', {abc: 'xyz'}, ChildrenDesc());
+        const viewData = createViewData('app', {abc: 'xyz'}, Children());
         assert.deepStrictEqual(componentRoot.data, viewData);
         assert.deepStrictEqual(componentRoot.el, {
             isTestElement: true,
@@ -111,19 +105,19 @@ describe('Engine', () => {
     });
 
     it('create() should create children views', () => {
-        const ChildrenDesc = () => [
-            ['foo', {yo: 'hey'}],
-            ['bar', {hey: 'yo'}],
+        const Children = () => [
+            h('foo', {yo: 'hey'}),
+            h('bar', {hey: 'yo'}),
         ];
-        const root = engine.create([
-            'main', {someProp: {abc: 1}}, ChildrenDesc(),
-        ]);
+        const root = engine.create(
+            h('main', {someProp: {abc: 1}}, ...Children()),
+        );
         assert.strictEqual(root.children.length, 2);
-        assert.deepStrictEqual(root.data, createViewData('main', {someProp: {abc: 1}}, ChildrenDesc()));
+        assert.deepStrictEqual(root.data, createViewData('main', {someProp: {abc: 1}}, Children()));
         assert.deepStrictEqual(root.el, {
             isTestElement: true,
             type: 'main',
-            props: createViewData('main', {someProp: {abc: 1}}, ChildrenDesc()),
+            props: createViewData('main', {someProp: {abc: 1}}, Children()),
         });
 
         let viewData = createViewData('foo', {yo: 'hey'}, []);
@@ -157,7 +151,7 @@ describe('Engine', () => {
         assert.strictEqual(fragment.el, root.el);
     });
     it('update() should update view', () => {
-        const root = engine.create([
+        const root = engine.create(h(
             'app', {
                 foo: 'whoa',
                 counter: 10,
@@ -167,7 +161,7 @@ describe('Engine', () => {
                 },
                 reactive: State('red'),
             },
-        ]);
+        ));
         engine.update(root, {
             bar: 'baz',
             counter: 11,
